@@ -1,0 +1,40 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-layout">
+
+    <form class="layui-form layui-form-pane" action="{:url('DataReportBrand/add_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>添加数据品牌</legend>
+
+            <div class="layui-field-box">
+
+                {:CMaker('relation')->label('所属分类')->helpinfo('')->table('data_report_category')->field('id,cat_name')->showtype('treeSelect')->name('cat_id')->layVerify('required')->render()}
+{:CMaker('text')->label('品牌名称')->helpinfo('')->placeholder('')->name('brand_name')->layVerify('required')->render()}
+
+
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+
+{:CMakerJs("all")}
+
+{/block}
+

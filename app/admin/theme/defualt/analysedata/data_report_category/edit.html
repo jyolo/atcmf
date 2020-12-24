@@ -1,0 +1,38 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-box">
+
+    <form class="layui-form layui-form-pane" action="{:url('DataReportCategory/edit_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>编辑数据分类</legend>
+
+            <div class="layui-field-box">
+
+                {:CMaker('relation')->label('所属分类')->helpinfo('')->table('data_report_category')->field('id,cat_name')->where('pid = 0')->showtype('select')->choose($vo['pid'])->name('pid')->layVerify('')->render()}
+{:CMaker('text')->label('分类名称')->helpinfo('')->placeholder('')->value($vo['cat_name'])->name('cat_name')->layVerify('required')->render()}
+{:CMaker('hidden')->name('id')->value($vo['id'])->render()}
+
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

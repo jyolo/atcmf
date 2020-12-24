@@ -1,0 +1,853 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<style>
+    .source_info_top{padding: 10px;}
+    table{table-layout:fixed;word-break:break-all;}
+    .layui-col-space15{margin-top:-20px;}
+    .cat_link_select .layui-form-label{width: auto}
+    .legend_title{color:#009688;font-weight:800;}
+    .ts_statsu_switch .layui-form-label{width: 70px;}
+    .add_switch{display:inline-block;height:30px;margin-right: 10px;margin-top: 20px;float:right}
+</style>
+<div class="layui-box">
+
+    <fieldset class="layui-elem-field">
+        <legend class="legend_title">投诉来源信息</legend>
+        <div class="layui-field-box">
+            <div class="layui-row">
+                <div class="layui-col-md2 source_info_top">投诉编号：{$vo.tsnumber}</div>
+                <div class="layui-col-md2 source_info_top">投诉人：{$vo.real_name}</div>
+                <div class="layui-col-md2 source_info_top">手机号：{$vo.mobile}</div>
+                <div class="layui-col-md2 source_info_top">投诉时间：{$vo.add_time|date='Y-m-d H:i:s'}</div>
+                <div class="layui-col-md2 source_info_top">投诉状态：{$vo.status}</div>
+                <div class="layui-col-md2 source_info_top">来源：{$vo.source}</div>
+                <div class="layui-col-md2 source_info_top">版本号：{$vo.version}</div>
+                <div class="layui-col-md2 source_info_top">评论数：{$vo.comment_num}</div>
+                <div class="layui-col-md2 source_info_top">浏览量：{$vo.view_num}</div>
+                <div class="layui-col-md2 source_info_top">地区：{$vo.address}</div>
+            </div>
+        </div>
+    </fieldset>
+    <!--投诉标题 & 投诉内容-->
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend class="legend_title">投诉标题 & 投诉内容</legend>
+    </fieldset>
+    <div class="layui-field-box">
+        <fieldset class="layui-elem-field">
+            <legend>标题</legend>
+            <div class="layui-field-box">
+                <div class="layui-row">
+                    <div class="layui-col-md12" style="padding: 20px; background-color: #f2dede;">
+                        {$vo.title}
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="layui-elem-field">
+            <legend>内容</legend>
+            <div class="layui-field-box">
+                <div class="layui-row">
+                    <div class="layui-col-md12" style="padding: 20px; background-color: #f2dede;">
+                        {$vo.content}
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    {foreach $vo['statics'] as $sk => $sv}
+                    <div class="layui-col-md1" style="float: left;margin-top: 10px;margin-right: 10px;">
+                        <img  src="{$sv.pic_url}" style="width: 100%;max-height: 200px;" >
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <!--用户补充投诉-->
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend class="legend_title">用户补充投诉</legend>
+    </fieldset>
+    <div class="layui-field-box">
+        <div class="layui-layout">
+            <div class="layui-collapse" lay-accordion>
+                {foreach $supplement as $k => $v}
+                    <!--跳过专员用户的补充-->
+                    {php}if($v['type'] == 1) continue;{/php}
+                    <div class="layui-colla-item">
+                    <h2 class="layui-colla-title">
+                        {$vo.real_name} 于：{$v.add_time} 补充投诉
+                        <span class="show_supplement_reply" data-id="{$v.id}" style="float: right"><i class="layui-icon">&#xe654;</i>回复</span>
+                    </h2>
+                    <div class="layui-colla-content {if $k==0}layui-show{/if}">
+                        <div style="padding: 20px; background-color: #f2dede;">
+                            <div class="layui-row">
+                                {$v.content}
+                            </div>
+                            <div class="layui-row" style="margin-top:10px;padding: 20px;width: 100%">
+                                {foreach $v['statics'] as $sk => $sv}
+                                <div class="layui-col-md2" style="width:14.666667%;margin-top: 10px;margin-right: 10px;">
+                                    <img  src="{$sv.pic_url}" style="width: 100%;max-height: 200px;" >
+                                    <div class="layui-form">
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label" style="width:30%;">公开</label>
+                                            <div class="layui-input-block" style="margin-left:10px;">
+                                                <input type="checkbox" class="supplement_static" lay-filter="supplement_pic_is_show_{$sv.id}"  data-id="{$sv.id}" {if $sv['pic_is_show'] == 1}checked=""{/if} lay-skin="switch" lay-text="是|否">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/foreach}
+                            </div>
+                        </div>
+                        <!--回复补充投诉内容 输入框-->
+                        <div class="layui-row supplement_reply_box supplement_reply_{$v.id} " style="padding: 20px; background-color: #F2F2F2;display: none">
+                            <div class="layui-form-item layui-form-text">
+                                <label class="layui-form-label" style="width: auto">回复内容</label>
+                                <div class="layui-input-block">
+                                    <div class="layui-col-md6">
+                                        <textarea data-id="{$v.id}" placeholder="请输入内容" class="layui-textarea" style="width: 100%"></textarea>
+                                    </div>
+                                    <div class="layui-col-md2" style="margin-left: 10px;">
+                                        <div class="layui-btn">保存</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--回复补充投诉内容-->
+                        <div class="reply_box_supplement_id_{$v.id}" style="height:200px;overflow:auto;">
+                            {foreach $v['replys'] as $re => $rv}
+                                <div class="layui-row" style="padding: 20px; background-color: #F2F2F2;">
+                                    <div class="layui-row layui-col-space15">
+                                        <div class="layui-col-md12">
+                                            <div class="layui-card">
+                                                <div class="layui-card-header"><span class="operator_name">{$rv.operator_truename}</span> 回复于：<span class="reply_time">{$rv.reply_time}</span></div>
+                                                <div class="layui-card-body">
+                                                    {$rv.reply_content}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/foreach}
+
+
+                        </div>
+
+                    </div>
+                </div>
+                {/foreach}
+
+            </div>
+
+        </div>
+    </div>
+
+    <!--专员补充投诉-->
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend class="legend_title">专员补充投诉</legend>
+    </fieldset>
+    <div class="layui-field-box">
+        <div class="layui-field-box">
+            <div class="layui-row">
+                <div class="layui-col-md10">
+                    <input type="text" name="title" required=""  placeholder="请输入投诉补充内容" class="layui-input operator_supplement_content" >
+                </div>
+                <div class="layui-col-md2">
+                    <button type="button" class="layui-btn operator_supplement_btn" style="float: right"><i class="layui-icon">&#xe654;</i>添加投诉补充</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-layout">
+            <div class="layui-collapse supplement_by_operator" lay-accordion>
+                {foreach $supplement as $k => $v}
+                    <!--跳过普通用户的补充-->
+                    {php}if($v['type'] == 0) continue;{/php}
+                    <div class="layui-colla-item">
+                        <h2 class="layui-colla-title">
+                            {$v.operator_truename} 于：{$v.add_time} 补充投诉
+                        </h2>
+                        <div class="layui-colla-content {if $k==0}layui-show{/if}">
+                            <div style="padding: 20px; background-color: #f2dede;">
+                                <div class="layui-row">{$v.content}</div>
+                            </div>
+                        </div>
+                    </div>
+                {/foreach}
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!--客服备注-->
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend class="legend_title">客服备注</legend>
+    </fieldset>
+    <div class="layui-field-box">
+        <div class="layui-field-box">
+            <div class="layui-row">
+                <div class="layui-col-md10">
+                    <input type="text" name="title" required=""  placeholder="请输入备注内容" class="layui-input operator_memo_content" >
+                </div>
+                <div class="layui-col-md2">
+                    <button type="button" class="layui-btn operator_memo_btn" style="float: right"><i class="layui-icon">&#xe654;</i>添加备注</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-layout">
+            {:CMaker("table")->filter("operator_memo")->height('200')->param(['id'=>$vo._id ])->cols([
+            ['templet'=> '#getManagerName' ,'fixed' => 'left','title' => '备注人员' ,'width'=>'8%'],
+            ['field' => "content",'title' => '备注内容' ,'edit' => 'text'],
+            ['field' => "memo_time",'title' => '备注时间','sort' => true ,'width'=>'10%'],
+            ['toolbar' => '#actionTpl' ,'title' => '操作','fixed' => 'right','width'=>'10%']
+            ])->page(false)->url(url('ComplaintOperatorMemo/get'))->editUrl(url('ComplaintOperatorMemo/edit'))->render()}
+        </div>
+    </div>
+
+    <script type="text/html" id="actionTpl" lay-filter="opentComplaint">
+        <div class="layui-btn-group">
+            <span data-url="{:url('ComplaintOperatorMemo/del')}" data-field="id" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="action" confirm-msg="确定删除？" confirm-type="del">删除</span>
+        </div>
+    </script>
+    <script type="text/html" id="getManagerName" lay-filter="opentComplaint">
+           {{d.manager.truename}}
+    </script>
+
+    <!--处理·编辑-->
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+        <legend class="legend_title">完善投诉</legend>
+    </fieldset>
+    <div class="layui-field-box" >
+        <form class="layui-form" action="" >
+            <!--标题-->
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend  style="font-size: 15px;">完善标题</legend>
+            </fieldset>
+            <div class="layui-col-md12 " style="margin-bottom: 20px;">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">投诉标题</label>
+                    <div class="layui-input-inline" style="width: 60%">
+                        <input type="text" name="title" value="{$vo.title}" class="layui-input" >
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">请输入完善后的标题</div>
+                </div>
+            </div>
+
+            <!--分类品牌-->
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend  style="font-size: 15px;">完善分类信息</legend>
+            </fieldset>
+            <div class="layui-col-md12 cat_link_select">
+                <div class="layui-col-md8">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">分类选择</label>
+                        <div class="layui-input-inline">
+                            <select name="cat_pid" lay-filter="cat_pid" lay-verify="required">
+                                <option value="">请选择一级分类</option>
+                                {foreach $vo['top_cat'] as $ck => $cv}
+                                    <option value="{$cv['id']}" {if $cv['id'] == $vo['cat_pid']}selected="selected"{/if}>{$cv['cat_name']}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="layui-input-inline" >
+                            <select name="cat_id" lay-filter="cat_id" lay-verify="required">
+                                <option value="">请选择二级分类</option>
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select name="brand_id" lay-filter="brand_id" lay-verify="required">
+                                <option value="">请选择品牌</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-input-inline">
+                        <span class="layui-btn link" data-url="{:url('ComplaintBrand/search')}" data-type="page">搜索品牌</span>
+                    </div>
+                    <div class="layui-input-inline">
+                        <span class="layui-btn link"  data-url="{:url('ComplaintBrand/add')}" data-type="page">
+                            <i class="layui-icon">&#xe654;</i>
+                            新增品牌
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!--分类附加属性-->
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend style="font-size: 15px;">完善附加属性，问题，诉求</legend>
+            </fieldset>
+            <div class="layui-field-box">
+                <div class="layui-row">
+                    <!--用户填写-->
+                    <div class="layui-col-md6 ">
+                        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 3px;">
+                            <legend style="font-size: 10px;margin-left: 30%">用户填写</legend>
+                        </fieldset>
+                        {foreach $vo['attrs'] as $k => $v}
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">{$v.attr_name}</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="use_attr_ids[{$v.attr_id}]"  value="{$v.attr_value}" readonly class="layui-input">
+                                <input type="hidden" name="user_attr_names[{$v.attr_id}]" value="{$v.attr_name}" class="layui-input">
+                            </div>
+                        </div>
+                        {/foreach}
+                    </div>
+                    <!--专员完善-->
+                    <div class="layui-col-md6 ">
+                        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 3px;">
+                            <legend style="font-size: 10px;margin-left: 30%">专员完善</legend>
+                        </fieldset>
+                        <div class="layui-field-box category_attrs">
+                            {foreach $vo['attrs'] as $k => $v}
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">{$v.attr_name}</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="username" class="layui-input">
+                                </div>
+                            </div>
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <fieldset class="layui-elem-field layui-field-title" >
+                            <legend style="font-size: 10px;margin-left: 15%">投诉问题</legend>
+                        </fieldset>
+                        <div class="layui-field-box ">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline " style="width: 100%">
+                                    <div class="cat_problem"></div>
+                                    <button class="layui-btn layui-btn-sm add_switch" data-url="{:url('info/operator_attr')}" lay-submit="" >
+                                        <i class="layui-icon">&#xe654;</i>
+                                        新增问题
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md12">
+                        <fieldset class="layui-elem-field layui-field-title" >
+                            <legend style="font-size: 10px;margin-left: 15%">投诉诉求</legend>
+                        </fieldset>
+                        <div class="layui-field-box ">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline " style="width: 100%">
+                                    <div class="cat_suqiu"></div>
+                                    <button class="layui-btn layui-btn-sm add_switch" data-url="{:url('info/operator_attr')}" lay-submit="" >
+                                        <i class="layui-icon">&#xe654;</i>
+                                        新增诉求
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md12" style="margin-bottom: 30px;">
+                    <button class="layui-btn" data-url="{:url('info/op_improve')}"  lay-submit="" style="width: 100%;margin-top: 20px;">
+                        <input type="hidden" name="old_cat_id" value="{$vo.cat_id}">
+                        保存完善后的 标题，分类，品牌，附加属性，投诉问题，投诉诉求
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+        <legend class="legend_title">处理·编辑</legend>
+    </fieldset>
+    <div class="layui-field-box">
+        <form class="layui-form" action="" >
+            <!--相关状态-->
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend style="font-size: 15px;">相关状态</legend>
+            </fieldset>
+            <div class="layui-field-box">
+                <div class="layui-row ts_statsu_switch">
+                    <div class="layui-col-md2">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">是否推荐</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="close" lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">完美解决</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="close" lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">热点投诉</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="close" lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">能否申诉</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="close" lay-skin="switch" lay-text="是|否">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md4">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">态度月评分</label>
+                            <div class="layui-input-inline">
+                                <div id="monthRate" ></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--其它-->
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend style="font-size: 15px;">其它</legend>
+            </fieldset>
+            <div class="layui-field-box">
+                <div class="layui-row">
+                    <!--左边-->
+                    <div class="layui-col-md6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">投诉关键词</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="keywords" autocomplete="off" placeholder="用_分隔，最多5个关键词" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">转给企业</label>
+                            <div class="layui-input-inline">
+                                <select name="to_company"  lay-search="">
+                                    <option value="">直接选择或搜索选择</option>
+                                    <option value="1">XXXX</option>
+                                    <option value="2">YYYYY</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">转给专员</label>
+                            <div class="layui-input-inline">
+                                <select name="to_operator"  lay-search="">
+                                    <option value="">直接选择或搜索选择</option>
+                                    <option value="1">aaa</option>
+                                    <option value="2">bbbb</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--右边-->
+                    <div class="layui-col-md6">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">处理结果</label>
+                            <div class="layui-input-inline">
+                                <select name="result_status"  lay-search="">
+                                    <option value="">直接选择或搜索选择</option>
+                                    <option value="1">layer</option>
+                                    <option value="2">form</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">投诉状态</label>
+                            <div class="layui-input-inline">
+                                <select name="ts_status"  lay-search="">
+                                    <option value="">直接选择或搜索选择</option>
+                                    <option value="1">layer</option>
+                                    <option value="2">form</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">涉及金额</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="with_money" value="{$vo.with_money}"  placeholder="请输入" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--底部-->
+                    <div class="layui-col-md12">
+
+                        <div class="layui-col-md2">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 70px;">投诉待处理</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="is_wait" lay-skin="switch" lay-text="是|否" lay-filter="is_wait">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md10">
+                            <div class="layui-form-item">
+                                <div class="layui-input-inline" style="width: 100%;">
+                                    <input type="text" class="layui-input wait_memo" name="wait_memo" readonly="readonly" placeholder="请输入投诉待处理备注" >
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!--推送设置-->
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend style="font-size: 15px;">推送设置</legend>
+            </fieldset>
+            <div class="layui-field-box">
+                <div class="layui-row">
+                    <div class="layui-col-md8">
+                        <div class="layui-form-item">
+                            <div class="layui-input-inline" style="width:87%">
+                                <input type="text" name="push_content" autocomplete="off" placeholder="请输入标题推送内容" class="layui-input">
+                            </div>
+                            <label class="layui-btn">推送</label>
+                        </div>
+                    </div>
+
+                    <div class="layui-col-md4">
+                        <div class="layui-form-item">
+                            <div class="layui-input-inline" style="width: 163px">
+                                <input type="text" name="push_time" class="layui-input" placeholder="yyyy-MM-dd HH:mm:ss">
+                            </div>
+                            <label class="layui-btn" >设置延迟推送时间</label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md12" style="margin-bottom: 130px;">
+                    <button class="layui-btn" data-url="{:url('info/edit')}" lay-submit="" style="width: 100%;margin-top: 20px;">提交</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+
+<script>
+    function sleep(delay) {
+        var start = (new Date()).getTime();
+        while ((new Date()).getTime() - start < delay) {
+            continue;
+        }
+    }
+
+    function in_array(search,array){
+        for(var i in array){
+            if(array[i]==search){
+                return true;
+            }
+        }
+        return false;
+    }
+    layui.use(['rate','form','jquery','layer','table','element'], function() {
+
+        var rate = layui.rate;
+        var $ = layui.jquery
+        var form = layui.form;
+        var table = layui.table;
+        var element = layui.element;
+        //基础效果
+        rate.render({
+            elem: '#monthRate',
+            choose: function(value){
+                var h = '<input type="hidden" class="monthRate_input" name="month_rate" value="'+value+'" >';
+                $('#monthRate').find('.monthRate_input').remove();
+                $('#monthRate').append(h);
+
+            }
+        })
+
+        // 用户追加评论 图片 是否显示 事件监听
+        $('.supplement_static').each(function(i,n){
+            var fliter = $(n).attr('lay-filter')
+
+            form.on('switch('+fliter+')', function(data){
+                var url = "{:url('ComplaintSupplement/setStaticShow')}"
+                var param = {}
+                param.pic_is_show = (data.elem.checked == true) ? 1: 0
+                param.id = $(data.elem).attr('data-id')
+                // p(param)
+                $.post(url,param,function(msg){
+                    layer.msg(msg.msg)
+                })
+
+            })
+        })
+        // 显示回复输入框
+        $('.show_supplement_reply').bind('click',function(){
+            let id = $(this).attr('data-id')
+            let class_name = 'supplement_reply_' + id
+            if($('.'+class_name).css('display') == 'none'){
+                $('.supplement_reply_box').css('display','none')
+                $('.'+class_name).css('display','block')
+            }else{
+                $('.'+class_name).css('display','none')
+            }
+            return false
+        })
+
+        // 提交用户追加投诉 回复
+        $('.supplement_reply_box').find('.layui-btn').click(function(){
+            var _this = $(this)
+            let postParam = {}
+            let requsteUrl = "{:url('ComplaintSupplement/reply')}"
+            postParam.reply_content = _this.parents('.layui-input-block').find('.layui-textarea').val()
+            postParam.supplement_id = _this.parents('.layui-input-block').find('.layui-textarea').attr('data-id')
+            $.ajax({
+                url:requsteUrl,
+                type:'post',
+                data:postParam,
+                success:function(msg){
+                    if(msg.code == 1){
+                        let redata = msg.data
+                        var h = '<div class="layui-row" style="padding: 20px; background-color: #F2F2F2;">\n' +
+                            '                            <div class="layui-row layui-col-space15">\n' +
+                            '                                <div class="layui-col-md12">\n' +
+                            '                                    <div class="layui-card">\n' +
+                            '                                        <div class="layui-card-header">' +
+                            '                                           <span class="operator_name">'+redata.operator_truename+'</span> 回复于：<span class="reply_time">'+redata.reply_time+'</span>' +
+                            '                                         </div>\n' +
+                            '                                        <div class="layui-card-body">\n' +
+                            '                                            '+redata.reply_content+'\n' +
+                            '                                        </div>\n' +
+                            '                                    </div>\n' +
+                            '                                </div>\n' +
+                            '                            </div>\n' +
+                            '                        </div>';
+
+                        $('.reply_box_supplement_id_'+ redata.supplement_id).prepend(h)
+                        _this.parents('.layui-input-block').find('.layui-textarea').val('')
+                        _this.parents('.layui-row').css('display','none')
+                    }else{
+                        layui.layer.msg(msg.msg)
+                    }
+                },
+            })
+
+        })
+
+        //添加客服备注
+        $('.operator_supplement_btn').click(function(){
+            var url = "{:url('ComplaintSupplement/add')}"
+            var param ={}
+            param.content = $('.operator_supplement_content').val()
+            param.ts_id = "{$vo._id}"
+            $.post(url,param,function(msg){
+                if(msg.code == 1){
+                    var data = msg.data
+                    var h = "<div class=\"layui-colla-item\">\n" +
+                        "                        <h2 class=\"layui-colla-title\">\n" +
+                        "                            "+data.operator_truename+" 于："+data.add_time+" 补充投诉\n" +
+                        "                        </h2>\n" +
+                        "                        <div class=\"layui-colla-content layui-show\">\n" +
+                        "                            <div style=\"padding: 20px; background-color: #f2dede;\">\n" +
+                        "                                <div class=\"layui-row\">"+data.content+"</div>\n" +
+                        "                            </div>\n" +
+                        "                        </div>\n" +
+                        "                    </div>";
+                    $('.supplement_by_operator').find('.layui-colla-content').removeClass('layui-show');
+                    $('.supplement_by_operator').prepend(h)
+                    $('.operator_supplement_content').val('')
+                    element.render('collapse');
+                }
+                layer.msg(msg.msg)
+
+            })
+        })
+
+        //添加专员投诉补充
+        $('.operator_memo_btn').click(function(){
+            var url = "{:url('ComplaintOperatorMemo/add')}"
+            var param ={}
+            param.content = $('.operator_memo_content').val()
+            param.ts_id = "{$vo._id}"
+            $.post(url,param,function(msg){
+                if(msg.code == 1){
+                    table.reload('table_0')
+                    $('.operator_memo_content').val('')
+                }
+                layer.msg(msg.msg)
+
+            })
+        })
+
+
+        //一级分类监听
+        form.on('select(cat_pid)',function (data) {
+            $('.cat_link_select').find('select').eq(1).find('.appended').remove()
+            $('.cat_link_select').find('select').eq(2).find('.appended').remove()
+
+            $.post("{:url('info/linkselect')}" ,{'type':'sonCat','cat_pid':data.value},function (msg) {
+                $.each(msg,function(i,n){
+                    if(n.id == '{$vo.cat_id}'){
+                        var h = '<option value="'+n.id+'" selected="selected" class="appended">'+n.cat_name+'</option>';
+                    }else{
+                        var h = '<option value="'+n.id+'" class="appended">'+n.cat_name+'</option>';
+                    }
+                    $('.cat_link_select').find('select').eq(1).append(h)
+                })
+                form.render('select')
+
+                if($('.cat_link_select').find('select').eq(1).next().find('dd[lay-value="{$vo.cat_id}"]').length == 1){
+                    $('.cat_link_select').find('select').eq(1).next().find('dd[lay-value="{$vo.cat_id}"]').trigger('click')
+                }
+
+            })
+        })
+        // 二级分类监听
+        form.on('select(cat_id)',function (data) {
+            $('.cat_link_select').find('select').eq(2).find('.appended').remove()
+
+            $.post("{:url('info/linkselect')}" ,{'type':'get_brand_and_withSubCatRelation','cat_id':data.value},function (msg) {
+                $.each(msg['brand'],function(i,n){
+                    if(n.brand_id == '{$vo.brand_id}'){
+                        var h = '<option value="'+n.brand_id+'" selected="selected" class="appended">'+n.brand_name+'</option>';
+                    }else{
+                        var h = '<option value="'+n.brand_id+'" class="appended">'+n.brand_name+'</option>';
+                    }
+                    $('.cat_link_select').find('select').eq(2).append(h)
+                })
+                form.render('select')
+
+
+                // 生成分类的 附加属性
+                $('.category_attrs').find('.layui-form-item').remove()
+                $.each(msg.attrs ,function(i,n){
+                    var h = '<div class="layui-form-item">\n' +
+                        '                            <label class="layui-form-label">'+n.attr_name+'</label>\n' +
+                        '                            <div class="layui-input-inline">\n' +
+                        '                                <input type="text" name="attr_ids['+n.attr_id+']"    class="layui-input">\n' +
+                        '                                <input type="hidden" name="attr_names['+n.attr_id+']" value="'+n.attr_name+'"   class="layui-input">\n' +
+                        '                            </div>\n' +
+                        '                        </div>';
+                    $('.category_attrs').append(h)
+                })
+
+                // 生成 投诉问题
+                $('.cat_problem').children().remove()
+                var user_choose_problem_ids = "{:$vo.problem_ids}".split(',');
+                $.each(msg['problem'],function (i,n) {
+                    if(in_array(n.problem_id ,user_choose_problem_ids)){
+                        var h = '<input type="checkbox" class="appended" name="ts_problem[]" value="'+n.problem_id+'" title="'+n.problem_name+'" checked="checked">';
+                    }else{
+                        var h = '<input type="checkbox" class="appended" name="ts_problem[]" value="'+n.problem_id+'" title="'+n.problem_name+'">';
+                    }
+
+                    $('.cat_problem').append(h)
+                })
+                form.render('checkbox');
+
+
+                // 诉求 投诉问题
+                $('.cat_suqiu').children().remove()
+                var user_choose_suqiu_ids = "{:$vo.suqiu_ids}".split(',');
+                $.each(msg['suqiu'],function (i,n) {
+                    if(in_array(n.suqiu_id ,user_choose_suqiu_ids)){
+                        var h = '<input type="checkbox" class="appended" name="ts_suqiu[]" value="'+n.suqiu_id+'" title="'+n.suqiu_name+'" checked="checked">';
+                    }else{
+                        var h = '<input type="checkbox" class="appended" name="ts_suqiu[]" value="'+n.suqiu_id+'" title="'+n.suqiu_name+'">';
+                    }
+                    $('.cat_suqiu').append(h)
+                })
+
+                form.render('checkbox');
+            })
+        })
+        // 搜索品牌弹窗 选择之后的 子页面桥接函数
+        window.reload_brand_linkselect = function(bid = false ){
+            if(bid != false){
+                var brand_id = bid
+            }else{
+                var brand_id = cookies.get('complaint_detail_brand_search_select')
+            }
+
+            if(!brand_id)return;
+            let _url = "{:url('ComplaintBrand/getCatInfo')}";
+            $.post(_url,{'brand_id':brand_id} ,function(msg){
+                // 一级分类
+                $('.cat_link_select').find('select').eq(0).next().find('dd[lay-value="'+msg.data['cat_pid']+'"]').trigger('click')
+                // 二级分类
+                var timer = setInterval(function(){
+                    var s = $('.cat_link_select').find('select').eq(1).next().find('dd[lay-value="'+msg.data['cat_id']+'"]').length
+                    if(s){
+                        $('.cat_link_select').find('select').eq(1).next().find('dd[lay-value="'+msg.data['cat_id']+'"]').trigger('click')
+                        clearInterval(timer)
+                    }
+                }, 300);
+                // // 最后的品牌
+                var timer2 = setInterval(function(){
+                    var s = $('.cat_link_select').find('select').eq(2).next().find('dd[lay-value="'+msg.data['brand_id']+'"]').length
+                    if(s){
+                        // 不是用户主动选择的 则触发 一次 select 事件
+                        $('.cat_link_select').find('select').eq(2).next().find('dd[lay-value="'+msg.data['brand_id']+'"]').trigger('click')
+                        clearInterval(timer2)
+                    }
+                }, 300);
+                //
+                // // 清除cookie
+                cookies.set('complaint_detail_brand_search_select','')
+            })
+
+        }
+        // 首次进入页面自动选择
+        $('.cat_link_select').find('select').eq(0).next().find('dd[lay-value="{$vo.cat_pid}"]').trigger('click')
+
+
+        // 投诉待处理
+        form.on('switch(is_wait)', function(data){
+            if(data.elem.checked == true){
+                $('.wait_memo').removeAttr('readonly')
+            }else{
+                $('.wait_memo').attr('readonly','readonly')
+                $('.wait_memo').val('')
+            }
+
+        });
+
+
+
+    })
+
+    // 完善投诉之后，投诉数据将会有两份。且 以客服完善的数据 为准 前台如何显示？依然以客服完善的为准 ？
+    // 完善投诉之后 是否可以被其它管理员 重新完善或继续完善？
+    //      多条完善数据 取谁的？ （按照时间倒序 最后一条？）
+    // 在客服更改投诉分类后，（附加属性，问题，诉求） 必须变为必填。否则变更之后 这三个 属性 均为空。 【要变得话，信息必须补全，否则该条投诉将会变为无用数据】
+    
+    // 处理结果 （处理完成，企业已处理 ，企业已驳回 ......）
+    // 处理状态 （审核中。已审核，处理中，转给企业，企业已查看，企业已处理，企业已驳回 ，处理完成）
+    //      状态不应该是手动选的，应该是跟着业务的扭转而自动变更的。
+    //      客服应该只有一个 ，标记 已完结 的权限
+
+</script>
+
+
+{:CMakerJs("all")}
+{/block}

@@ -1,0 +1,47 @@
+{extend name='index/main'}
+
+{block name='main'}
+<div class="layui-layout">
+
+    <form class="layui-form layui-form-pane" action="{:url('role/add_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>角色信息</legend>
+
+
+            <div class="layui-field-box">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="role_name" lay-verify="required"  placeholder="菜单名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色描述</label>
+                    <div class="layui-input-block">
+                        <textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">是否冻结</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox"  name="status" lay-skin="switch" lay-text="是|否" value="1" lay-filter="switchTest" title="是否冻结" >
+                    </div>
+                </div>
+            </div>
+
+        </fieldset>
+
+        <div class="layui-form-item" style="margin-left: 36%">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{/block}

@@ -1,0 +1,43 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+
+<div class="layui-layout">
+    {if count($tab) > 0}
+    <form class="layui-form " action="{:url('setting/save_setting')}" method="post" lay-filter="list-table">
+        <div class="layui-tab layui-tab-brief">
+            <ul class="layui-tab-title">
+                {foreach $tab as $k => $v}
+                    <li {if $k == 0}class="layui-this"{/if}>{$v.group_name}</li>
+                {/foreach}
+            </ul>
+            <div class="layui-tab-content">
+                {foreach $tab as $k => $v}
+                    <div class="layui-tab-item {if $k == 0}layui-show{/if}">
+                        {$v['form'] | raw}
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit >立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    {else/}
+
+        <blockquote class="layui-elem-quote">暂无数据</blockquote>
+
+    {/if}
+
+
+</div>
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

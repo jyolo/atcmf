@@ -1,0 +1,122 @@
+{extend name='index/main'}
+
+{block name='main'}
+<div class="layui-layout">
+    <!--
+    <fieldset class="layui-elem-field" style="padding:10px;">
+        <legend>查找</legend>
+        <blockquote class="layui-elem-quote">
+            <form class="layui-form layui-form-pane" action="{:url('role/index')}" method="post" lay-filter="search">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">查询字段</label>
+                    <div class="layui-input-inline" style="width: 200px;">
+                        <select class="layui-select" name="where[field]" >
+                            <option value="">选择查询字段</option>
+                            <option value="id">角色id</option>
+                            <option value="role_name">角色名称</option>
+                        </select>
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline">
+                        <input type="text" name="where[keyword]" placeholder="输入查找内容" autocomplete="off" class="layui-input" >
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">时间范围</label>
+                    <div class="layui-input-inline" style="width: 200px;">
+                        <input type="text" name="where[add_time][start]" placeholder="起始时间" autocomplete="off" class="layui-input start_time" >
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline" style="width: 200px;">
+                        <input type="text" name="where[add_time][end]" placeholder="结束时间" autocomplete="off" class="layui-input end_time" >
+                    </div>
+                    <div class="layui-form-mid"></div>
+                    <div class="layui-input-inline" >
+                        <button class="layui-btn" lay-submit data-type="search_reload_table" table-id="listTable">搜索</button>
+                        <button class="layui-btn" type="reset" >重置</button>
+                    </div>
+                </div>
+            </form>
+        </blockquote>
+    </fieldset>
+    -->
+
+    <form class="layui-form layui-form-pane" action="" method="post" lay-filter="list-table">
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            <button class="layui-btn" lay-submit data-url="{:url('role/pdel')}" data-call-back="reload_table" table-id="listTable">
+                批量删除
+            </button>
+
+            <button class="layui-btn link" data-type="page"  data-url="{:url('role/add')}" style="float: right">
+                添加
+            </button>
+        </blockquote>
+
+        <div class="layui-form">
+            <table class="layui-table" lay-filter="layui-table" lay-data="{id:'listTable',height:500, url:'{:url('role/index')}',method:'post',response:{statusCode:1},page:true,limit:10,limits:[20,30,60,100]}">
+                <thead>
+                <tr>
+                    <th lay-data="{checkbox:true}" ></th>
+                    <th lay-data="{field:'id' ,align: 'center'}">id</th>
+                    <th lay-data="{field:'role_name' ,align: 'center'}">角色名称</th>
+                    <th lay-data="{field:'status' ,align: 'center'}">状态</th>
+                    <th lay-data="{field:'add_time' ,align: 'center'}">添加时间</th>
+                    <th lay-data="{width:200 ,toolbar: '#actionTpl',fixed:'right'}">操作</th>
+                </tr>
+                </thead>
+            </table>
+
+            <script type="text/html" id="actionTpl" lay-filter="actionbar">
+                <div class="layui-btn-group">
+                    {{#  if(d.id != 1){   }}
+                    <span data-url="{:url('role/author')}"  data-field="id" class="layui-btn layui-btn-sm" lay-event="edit">权限设置</span>
+                    {{#  }   }}
+                    <span data-url="{:url('role/edit')}" data-field="id" class="layui-btn layui-btn-sm" lay-event="edit">编辑</span>
+                    <span data-url="{:url('role/del')}"  class="layui-btn layui-btn-sm layui-btn-danger" lay-event="action" confirm-msg="确定删除？" confirm-type="del">删除</span>
+                </div>
+            </script>
+        </div>
+
+
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            <button class="layui-btn" lay-submit data-url="{:url('role/pdel')}" data-call-back="reload_table" table-id="listTable">
+                批量删除
+            </button>
+
+            <button class="layui-btn link" data-type="page"  data-url="{:url('role/add')}" style="float: right">
+                添加
+            </button>
+        </blockquote>
+    </form>
+</div>
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+<script>
+
+    layui.use(['laydate','table','tableExtend'],function(){
+
+        parent.listTable = layui.table
+            ,laydate = layui.laydate
+            ,tableExtend = layui.tableExtend;
+
+        laydate.render({
+            elem: '.start_time',
+            type: 'datetime'
+        });
+        laydate.render({
+            elem: '.end_time',
+            type: 'datetime'
+        });
+
+        parent.listTable.on('tool(layui-table)',tableExtend._tool);
+        parent.listTable.on('checkbox(layui-table)', tableExtend._checkbox);
+
+
+    });
+    
+
+
+</script>
+
+{/block}

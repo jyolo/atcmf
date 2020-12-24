@@ -1,0 +1,40 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-box">
+
+    <form class="layui-form layui-form-pane" action="{:url('Manager/changepwd')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>修改密码</legend>
+
+            <div class="layui-field-box">
+
+
+            {:CMaker('password')->label('旧密码')->helpinfo('请输入旧密码')->value()->name('old_pwd')->layVerify('required')->render()}
+            {:CMaker('password')->label('新密码')->helpinfo('请输入新密码')->value()->name('new_pwd')->layVerify('required')->render()}
+            {:CMaker('password')->label('确认新密码')->helpinfo('请再次输入新密码')->value()->name('re_new_pwd')->layVerify('required')->render()}
+
+
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

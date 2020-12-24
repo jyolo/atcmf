@@ -1,0 +1,97 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-box">
+    <div class="layui-box">
+        <table id="info" lay-filter="info">
+            <thead>
+            <tr>
+                <th lay-data="{field:'brand_name', width:'15%'}">匹配到的品牌</th>
+                <th lay-data="{field:'source', width:'10%'}">来源</th>
+                <th lay-data="{field:'target', width:'10%'}">投诉对象</th>
+                <th lay-data="{field:'problem', width:'10%'}">投诉问题</th>
+                <th lay-data="{field:'wanted', width:'10%'}">投诉诉求</th>
+                <th lay-data="{field:'content', width:'20%'}">投诉内容</th>
+                <th lay-data="{field:'desc', width:'25%'}">摘要原数据</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{$info['brand_name']}</td>
+                <td>{$info['source']}</td>
+                <td>{$info['target']}</td>
+                <td>{$info['problem']}</td>
+                <td>{$info['wanted']}</td>
+                <td>{$info['content']}</td>
+                <td>{$info['desc']}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <form class="layui-form layui-form-pane" action="{:url('DataReport/bind_brand')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>请选择绑定的品牌</legend>
+
+
+
+            <div class="layui-field-box">
+                {:CMaker('linkselect')->label('一级分类|二级分类|所属品牌')
+                ->helpinfo('')
+                ->linkfield('cat_pid|cat_id|brand_id')
+                ->serverUrl(url('DataReport/linkselect'))
+                ->param('type-topCat| type-sonCat | type-brand')
+                ->showfield('id-name|id-name|id-brand_name')
+                ->render()}
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <input type="hidden" name="table_id" value="{$table_id}">
+                <input type="hidden" name="id" value="{$info['_id']}">
+                <button class="layui-btn"  lay-submit data-call-back="close_current_layer" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+<script>
+
+
+
+    layui.use(['table','layer'],function(){
+        var table = layui.table;
+        var $ = layui.jquery
+
+        //转换静态表格
+        table.init('info', {
+            height: 100 //设置高度
+        });
+
+        //关闭当前layer弹窗 ,并调用前一个layer iframe 里面的 reload_curren_table 函数
+        window.close_current_layer = function (){
+            var index = parent.layer.getFrameIndex(window.name);
+            var obj = $(parent.window.document).find('.layui-layer-iframe').find('iframe')
+            $.each(obj,function(i,n){
+                if($(n).attr('id') != window.name){
+                    $(n)[0].contentWindow.reload_curren_table()
+                    console.log($(n)[0].contentWindow.reload_curren_table())
+                }
+            })
+            parent.layer.close(index);
+        }
+    })
+</script>
+
+{:CMakerJs("all")}
+
+{/block}

@@ -1,0 +1,492 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<style>
+    .search-quote{float:left;width: auto;}
+    .layui-form-item{width:auto;float:left;clear: none;}
+    /*.layui-boxs{padding:15px;}*/
+    .layui-elem-quote{padding:10px;}
+    .firstCheck{margin-left: 0; }
+    .checkBox{ margin-left: 0!important;}
+    .layuiQuote{height: 38px; margin-bottom:10px }
+    .layuiQuote a {line-height: 38px;}
+</style>
+
+
+<div class="layui-tab" lay-filter="switch_table">
+    <ul class="layui-tab-title">
+        <li class="layui-this">未匹配数据</li>
+        <li>歧义的数据</li>
+        <li>已匹配数据</li>
+    </ul>
+    <div class="layui-tab-content">
+
+        <!--tab 1  未匹配的table-->
+        <div class="layui-tab-item layui-show">
+
+
+           <div class="layui-layout">
+               <form class="layui-form layui-form-pane" name="data_report_1" method="post" lay-filter="list-table">
+                   <blockquote class="layui-elem-quote search-quote" style="float: left">
+                       <div class="layui-boxs">
+                           {:CMaker("text")->label("投诉标题")->name('where[title]')->render()}
+                           {:CMaker("text")->label("投诉问题")->name('where[problem]')->render()}
+                           {:CMaker("text")->label("投诉诉求")->name('where[wanted]')->render()}
+                           {:CMaker("text")->label("投诉内容")->name('where[content]')->render()}
+                           {:CMaker("text")->label("投诉摘要")->name('where[desc]')->render()}
+                           <div class="layui-form-item">
+                               <div class="layui-inline">
+                                   <div class="layui-input-inline">
+                                       <button class="layui-btn lay-submit" action="{:url('DataReport/show_build_data',['table_id'=> $id ,'type' => 0])}" lay-submit data-type="search_reload_table" table-index="0">
+                                           <i class="layui-icon">&#xe615;</i> 搜索
+                                       </button>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </blockquote>
+                   {:CMaker("table")->filter("data_report_1")->cols([
+                   ['type'=>'checkbox'] ,
+                   ['field' => "id",'title' => 'id','sort' => true ],
+                   ['field' => "brand_name",'title' => '匹配到的品牌','width'=> '15%','sort' => true ],
+                   ['field' => "cat_problem",'title' => '绑定的投诉问题','width'=> '15%','sort' => true ],
+                   ['field' => 'source','title' => '来源','width'=> '10%','sort' => true ] ,
+                   ['field' => 'title','title' => '标题','width'=> '15%','sort' => true ] ,
+                   ['field' => 'target','title' => '投诉对象','width'=> '15%','sort' => true ] ,
+                   ['field' => 'problem','title' => '投诉问题','width'=> '15%','sort' => true ] ,
+                   ['field' => 'wanted','title' => '投诉诉求','width'=> '15%','sort' => true ] ,
+                   ['field' => 'content','title' => '投诉内容','width'=> '30%','sort' => true ] ,
+                   ['field' => 'desc','title' => '摘要原数据','width'=> '30%','sort' => true ] ,
+                   //['toolbar' => '#actionTpl' ,'title' => '操作','width'=> '17%','fixed' => 'right']
+                   ])->page(true)->limits([50,100,200,300])->limit(50)->url(url('data_report/show_build_data',['table_id'=> $id ,'type' => 0]))->editUrl(url('data_report/show_build_data',['table_id'=> $id ,'type' => 0]))->render()}
+
+                   <script type="text/html" id="actionTpl" lay-filter="defualt">
+                       <div class="layui-btn-group">
+                           <span data-url="{:url('DataReport/bind_brand' ,['table_id'=> $id ])}" data-field="id" class="layui-btn layui-btn-sm" lay-event="edit">绑定品牌</span>
+                           <span data-url="{:url('DataReport/bind_problem' ,['table_id'=> $id ])}" data-field="id" class="layui-btn layui-btn-sm" lay-event="edit">绑定问题</span>
+                       </div>
+                   </script>
+                   <blockquote class="layui-elem-quote layui-quote-nm">
+                       {:CMaker('linkselect')->label('一级分类|二级分类|所属品牌')
+                       ->helpinfo('')
+                       ->linkfield('cat_pid|cat_id|brand_id')
+                       ->serverUrl(url('DataReport/linkselect'))
+                       ->param('type-topCat| type-sonCat | type-brand')
+                       ->showfield('id-cat_name|id-cat_name|id-brand_name')
+                       ->render()}
+                       <div class="layui-boxs">
+                           <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_brand',['table_id'=> $id ])}" data-call-back="reload_curren_table" table-index="0">
+                               批量绑定品牌
+                           </button>
+                           <span class="layui-btn link"  data-url="{:url('DataReportBrand/add')}" data-type="page" >
+                               添加品牌
+                           </span>
+                       </div>
+                   </blockquote>
+                   <blockquote class="layui-elem-quote layui-quote-nm">
+                       {:CMaker('linkselect')->label('一级分类|二级分类')
+                       ->helpinfo('')
+                       ->linkfield('cat_pid|problem_cat_id')
+                       ->serverUrl(url('DataReport/linkselect'))
+                       ->param('type-topCat| type-sonCat ')
+                       ->showfield('id-cat_name|id-cat_name')
+                       ->render()}
+                       <div class="layui-boxs">
+                           <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_problem',['table_id'=> $id ,'type' => 'append' ])}" data-call-back="reload_curren_table" table-index="0">
+                               追加绑定问题
+                           </button>
+                           <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_problem',['table_id'=> $id ,'type' => 'edit'])}" data-call-back="reload_curren_table" table-index="0">
+                               修改绑定问题
+                           </button>
+                           <span class="layui-btn link"  data-url="{:url('DataReportProblem/add')}" data-type="page" >
+                               添加问题
+                           </span>
+                       </div>
+                   </blockquote>
+                   <blockquote class="layui-elem-quote layui-quote-nm layuiQuote">
+                       <div class="layui-boxs">
+                           <div class="layui-form-item">
+                               <div class="layui-input-block checkBox">
+                                   <a>请先选择二级分类</a>
+                               </div>
+                            </div>
+                        </div>
+                   </blockquote>
+               </form>
+           </div>
+
+
+       </div>
+       <!--tab 2 匹配到多个品牌的 table-->
+        <div class="layui-tab-item">
+
+            <div class="layui-layout">
+                <form class="layui-form layui-form-pane" name="data_report_2" method="post" lay-filter="list-table">
+                    <fieldset class="layui-elem-field layui-field-title" >
+                        <legend>搜索</legend>
+                        <blockquote class="layui-elem-quote search-quote">
+                            <div class="layui-boxs">
+                                {:CMaker("text")->label("投诉标题")->name('where[title]')->render()}
+                                {:CMaker("text")->label("投诉问题")->name('where[problem]')->render()}
+                                {:CMaker("text")->label("投诉诉求")->name('where[wanted]')->render()}
+                                {:CMaker("text")->label("投诉内容")->name('where[content]')->render()}
+                                {:CMaker("text")->label("投诉摘要")->name('where[desc]')->render()}
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <div class="layui-input-inline">
+                                            <button class="layui-btn lay-submit" action="{:url('DataReport/show_build_data',['table_id'=> $id ,'type' => 1])}" lay-submit data-type="search_reload_table" table-index="1">
+                                                <i class="layui-icon">&#xe615;</i> 搜索
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </blockquote>
+                    </fieldset>
+                    {:CMaker("table")->filter("data_report_2")->cols([
+                    ['type'=>'checkbox'] ,
+                    ['field' => "id",'title' => 'id','sort' => true ],
+                    ['field' => "brand_name",'title' => '匹配到的品牌','width'=> '18%','sort' => true ],
+                    ['field' => "cat_problem",'title' => '绑定的投诉问题','width'=> '15%','sort' => true ],
+                    ['field' => 'source','title' => '来源','width'=> '10%','sort' => true ] ,
+                    ['field' => 'title','title' => '标题','width'=> '15%','sort' => true ] ,
+                    ['field' => 'target','title' => '投诉对象','width'=> '15%','sort' => true ] ,
+                    ['field' => 'problem','title' => '投诉问题','width'=> '15%','sort' => true ] ,
+                    ['field' => 'wanted','title' => '投诉诉求','width'=> '15%','sort' => true ] ,
+                    ['field' => 'content','title' => '投诉内容','width'=> '30%','sort' => true ] ,
+                    ['field' => 'desc','title' => '摘要原数据','width'=> '30%','sort' => true ] ,
+                    //['toolbar' => '#actionTpl3' ,'title' => '操作','width'=> '9%','fixed' => 'right']
+                    ])->page(true)->limits([50,100,200,300])->limit(50)->url(url('data_report/show_build_data',['table_id'=> $id ,'type' => 1]))->editUrl(url('data_report/show_build_data',['id'=> $id ,'type' => 0]))->render()}
+
+                    <script type="text/html" id="actionTpl3" lay-filter="data_report_2">
+                        <div class="layui-btn-group">
+                            <span data-url="{:url('DataReport/edit')}" data-field="id" class="layui-btn layui-btn-sm" lay-event="edit">绑定品牌</span>
+                        </div>
+                    </script>
+                    <blockquote class="layui-elem-quote layui-quote-nm">
+                        {:CMaker('linkselect')->label('一级分类|二级分类|所属品牌')
+                        ->helpinfo('')
+                        ->linkfield('cat_pid|cat_id|brand_id')
+                        ->serverUrl(url('DataReport/linkselect'))
+                        ->param('type-topCat| type-sonCat | type-brand')
+                        ->showfield('id-cat_name|id-cat_name|id-brand_name')
+                        ->render()}
+                        <div class="layui-boxs">
+                            <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_brand',['table_id'=> $id ])}" data-call-back="reload_curren_table" table-index="1">
+                                批量绑定
+                            </button>
+                            <span class="layui-btn link"  data-url="{:url('DataReportBrand/add')}" data-type="page" >
+                               添加品牌
+                           </span>
+                        </div>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote layui-quote-nm">
+                        {:CMaker('linkselect')->label('一级分类|二级分类')
+                        ->helpinfo('')
+                        ->linkfield('cat_pid|problem_cat_id')
+                        ->serverUrl(url('DataReport/linkselect'))
+                        ->param('type-topCat| type-sonCat ')
+                        ->showfield('id-cat_name|id-cat_name')
+                        ->render()}
+                        <div class="layui-boxs">
+                            <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_problem',['table_id'=> $id ,'type' => 'append' ])}" data-call-back="reload_curren_table" table-index="1">
+                                追加绑定问题
+                            </button>
+                            <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_problem',['table_id'=> $id ,'type' => 'edit'])}" data-call-back="reload_curren_table" table-index="1">
+                                修改绑定问题
+                            </button>
+                            <span class="layui-btn link"  data-url="{:url('DataReportProblem/add')}" data-type="page" >
+                               添加问题
+                           </span>
+                        </div>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote layui-quote-nm layuiQuote">
+                        <div class="layui-boxs">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block checkBox">
+                                </div>
+                            </div>
+                        </div>
+                    </blockquote>
+                </form>
+            </div>
+        </div>
+        <!--tab 3-->
+        <div class="layui-tab-item">
+
+            <div class="layui-layout">
+                <form class="layui-form layui-form-pane" name="data_report_3" method="post" lay-filter="list-table">
+                    <fieldset class="layui-elem-field layui-field-title" >
+                        <legend>搜索</legend>
+                        <blockquote class="layui-elem-quote search-quote">
+                            <div class="layui-boxs">
+                                {:CMaker("text")->label("投诉标题")->name('where[title]')->render()}
+                                {:CMaker("text")->label("投诉问题")->name('where[problem]')->render()}
+                                {:CMaker("text")->label("投诉诉求")->name('where[wanted]')->render()}
+                                {:CMaker("text")->label("投诉内容")->name('where[content]')->render()}
+                                {:CMaker("text")->label("投诉摘要")->name('where[desc]')->render()}
+                                <hr/>
+                                <input type="hidden" name="where[cat_problem]" id="cat_problem">
+                                {:CMaker('linkselect')->label('一级分类|二级分类')
+                                ->helpinfo('')
+                                ->linkfield('cat_pid|cat_id_for_problem')
+                                ->serverUrl(url('DataReport/linkselect'))
+                                ->param('type-topCat| type-sonCat ')
+                                ->showfield('id-cat_name|id-cat_name')
+                                ->render()}
+                                <div class="layui-form-item search_probelm">
+
+                                    <div class="layui-inline">
+                                        <div class="layui-input-block checkBox">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr/>
+                                {:CMaker('linkselect')->label('一级分类|二级分类|所属品牌')->helpinfo('')
+                                ->linkfield('cat_pid|cat_id|where[brand_id]')
+                                ->serverUrl(url('DataReport/linkselect'))
+                                ->param('type-topCat| type-sonCat | type-brand')
+                                ->showfield('id-cat_name|id-cat_name|id-brand_name')
+                                ->render()}
+                                <hr/>
+                                {:CMaker('linkselect')->label('一级分类|二级分类')->helpinfo('')
+                                ->linkfield('cat_pid|where[cat_id]')
+                                ->serverUrl(url('DataReport/linkselect'))
+                                ->param('type-topCat| type-sonCat | type-brand')
+                                ->showfield('id-cat_name|id-cat_name|id-brand_name')
+                                ->render()}
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <div class="layui-input-inline">
+                                            <button class="layui-btn lay-submit" action="{:url('DataReport/show_build_data',['table_id'=> $id ,'type' => 2])}" lay-submit data-type="search_reload_table" table-index="2">
+                                                <i class="layui-icon">&#xe615;</i> 搜索
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </blockquote>
+                    </fieldset>
+                    {:CMaker("table")->filter("data_report_3")->cols([
+                    ['type'=>'checkbox'] ,
+                    ['field' => "id",'title' => 'id','sort' => true ],
+                    ['field' => "brand_name",'title' => '匹配到的品牌','width'=> '18%','sort' => true ],
+                    ['field' => "cat_problem",'title' => '绑定的投诉问题','width'=> '15%','sort' => true ],
+                    ['field' => 'source','title' => '来源','width'=> '10%','sort' => true ] ,
+                    ['field' => 'title','title' => '标题','width'=> '15%','sort' => true ] ,
+                    ['field' => 'target','title' => '投诉对象','width'=> '15%','sort' => true ] ,
+                    ['field' => 'problem','title' => '投诉问题','width'=> '15%','sort' => true ] ,
+                    ['field' => 'wanted','title' => '投诉诉求','width'=> '15%','sort' => true ] ,
+                    ['field' => 'content','title' => '投诉内容','width'=> '30%','sort' => true ] ,
+                    ['field' => 'desc','title' => '摘要原数据','width'=> '30%','sort' => true ] ,
+                    //['toolbar' => '#actionTpl2' ,'title' => '操作','width'=> '9%','fixed' => 'right']
+                    ])->page(true)->limits([50,100,200,300]) ->limit(50)->url(url('data_report/show_build_data',['table_id'=> $id ,'type' => 2]))->editUrl(url('data_report/show_build_data',['id'=> $id ,'type' => 0]))->render()}
+
+                    <script type="text/html" id="actionTpl2" lay-filter="data_report_3">
+                        <div class="layui-btn-group">
+                            <span data-url="{:url('DataReport/bind_brand' ,['table_id'=> $id ])}" data-field="id" class="layui-btn layui-btn-sm" lay-event="action">绑定品牌</span>
+                        </div>
+                    </script>
+                    <blockquote class="layui-elem-quote layui-quote-nm">
+                        {:CMaker('linkselect')->label('一级分类|二级分类|所属品牌')
+                        ->helpinfo('')
+                        ->linkfield('cat_pid|cat_id|brand_id')
+                        ->serverUrl(url('DataReport/linkselect'))
+                        ->param('type-topCat| type-sonCat | type-brand')
+                        ->showfield('id-cat_name|id-cat_name|id-brand_name')
+                        ->render()}
+                        <div class="layui-boxs">
+                            <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_brand',['table_id'=> $id ])}" data-call-back="reload_curren_table" table-index="2">
+                                批量绑定品牌
+                            </button>
+                            <span class="layui-btn link"  data-url="{:url('DataReportBrand/add')}" data-type="page" >
+                               添加品牌
+                           </span>
+                        </div>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote layui-quote-nm">
+                        {:CMaker('linkselect')->label('一级分类|二级分类')
+                        ->helpinfo('')
+                        ->linkfield('cat_pid|problem_cat_id')
+                        ->serverUrl(url('DataReport/linkselect'))
+                        ->param('type-topCat| type-sonCat ')
+                        ->showfield('id-cat_name|id-cat_name')
+                        ->render()}
+                        <div class="layui-boxs">
+                            <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_problem',['table_id'=> $id ,'type' => 'append' ])}" data-call-back="reload_curren_table" table-index="2">
+                                追加绑定问题
+                            </button>
+                            <button class="layui-btn" lay-submit data-url="{:url('DataReport/batch_bind_problem',['table_id'=> $id ,'type' => 'edit'])}" data-call-back="reload_curren_table" table-index="2">
+                                修改绑定问题
+                            </button>
+                            <span class="layui-btn link"  data-url="{:url('DataReportProblem/add')}" data-type="page" >
+                               添加问题
+                           </span>
+                        </div>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote layui-quote-nm layuiQuote">
+                        <div class="layui-boxs">
+                            <div class="layui-form-item">
+                                <div class="layui-input-block checkBox">
+
+                                </div>
+                            </div>
+                        </div>
+                    </blockquote>
+                </form>
+<!--                <blockquote class="layui-elem-quote layui-quote-nm">-->
+<!--                    <div class="layui-boxs">-->
+<!--                        <span class="layui-btn layui-btn-danger link" data-type="post" confirm-msg="确定保存？" data-url="{:url('DataReport/save_all',['table_id'=> $id ])}" data-call-back="reload_curren_table" table_index="3">-->
+<!--                            确认无误？点击保存本份文档数据-->
+<!--                        </span>-->
+<!--                    </div>-->
+<!--                </blockquote>-->
+            </div>
+
+
+
+        </div>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+
+
+{:CMakerJs("all")}
+
+
+<script>
+
+    window.reload_curren_table = function(msg){
+        try{
+            var tableObj = this.table
+            $.each(this.component_set ,function(i,n){
+                if(n.component_name == 'table') {
+                    tableObj.reload(n.uniqid_id);
+                }
+            })
+            // 提交完之后 去掉之前选择的 checkbox
+            $.each($('input[type=hidden]') ,function(i,n){
+                if($(n).attr('name').match('ids')){
+                    $(n).remove()
+                }
+            })
+
+
+        }catch (e){
+            throw new DOMException(e);
+        }
+    }
+
+    layui.use(['jquery','table','element','form'],function(){
+        $ = layui.jquery
+        table = layui.table;
+        element = layui.element
+        form = layui.form
+
+        //一些事件监听
+        element.on('tab(switch_table)', function(data){
+            var current_table_id = $('.layui-tab-item').eq(data.index).find('table').attr('id');
+            table.resize(current_table_id)
+        });
+
+        // 所有linkselect 开启 输入搜索功能
+        $.each(window.component_set ,function (i,n) {
+            if(n.component_name == 'linkselect'){
+                var dom = $('#'+n.uniqid_id)[0]
+                $(dom).find('select').attr('lay-search','1')
+                form.render()
+            }
+        })
+
+
+        $.each(window.component_set ,function (i,n) {
+
+            if(n.component_name == 'linkselect' && n.set.label == '一级分类|二级分类'){
+
+                form.on('select('+n.uniqid_id+'_1)', function(data){
+
+                    var get_problem_url = "{:url('DataReport/batch_bind_problem' ,['action'=>'get_problem'])}"
+                    $.post(get_problem_url ,{'problem_cat_id':data.value} ,function(msg){
+                            if(msg.length){
+                            var dom = '';
+
+
+                            if($(data.elem).attr('name') == 'cat_id_for_problem')
+                            {
+                                for(var i = 0 ;i < msg.length ; i++){
+                                    dom += '<input type="checkbox" lay-filter="cat_problem" name="cat_problem" title="'+msg[i].name+'" value="'+msg[i].id+'">';
+                                }
+
+                                $(data.elem).parents('.linkselect').next().find('.checkBox').children().remove()
+                                $(data.elem).parents('.linkselect').next().find('.checkBox').append(dom)
+
+                            }
+                            else
+                            {
+                                for(var i = 0 ;i < msg.length ; i++){
+                                    dom += '<input type="checkbox" name="problem[ids]['+msg[i].id+']" title="'+msg[i].name+'" value="'+msg[i].id+'_'+msg[i].name+'">';
+                                }
+
+                                $(data.elem).parents('blockquote').next().find('.checkBox').children().remove()
+                                $(data.elem).parents('blockquote').next().find('.checkBox').append(dom)
+                            }
+
+                            form.render()
+
+                        }else{
+                            if($(data.elem).attr('name') == 'cat_id_for_problem')
+                            {
+                                $(data.elem).parents('.linkselect').next().find('.checkBox').children().remove()
+                                $(data.elem).parents('.linkselect').next().find('.checkBox').append('<a>该分类下，暂无投诉问题，请先在该分类下添加问题！</a>')
+                            }
+                            else
+                            {
+                                $(data.elem).parents('blockquote').next().find('.checkBox').children().remove()
+                                $(data.elem).parents('blockquote').next().find('.checkBox').append('<a>该分类下，暂无投诉问题，请先在该分类下添加问题！</a>')
+                            }
+
+                            form.render()
+                        }
+
+
+                    })
+                });
+            }
+        });
+
+
+        var ids = []
+        form.on('checkbox(cat_problem)', function(data){
+            p('1111111');
+            pid = $(data.elem).attr('data-value')
+
+            if(data.elem.checked == true){
+                ids[data.elem.value] = data.elem.value
+            }else{
+
+                delete ids[data.elem.value]
+            }
+
+            problem_val = Object.keys(ids).join(',')
+            $('#cat_problem').val(problem_val)
+
+            form.render()
+        });
+
+
+
+
+    })
+
+
+</script>
+
+
+{/block}

@@ -1,0 +1,39 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-box">
+
+    <form class="layui-form layui-form-pane" action="{:url('DataReport/edit_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>编辑数据报告</legend>
+
+            <div class="layui-field-box">
+
+                {:CMaker('relation')->label('报告类型')->helpinfo('')->table('data_report_type')->field('id,type_name')->showtype('select')->choose($vo['type_id'])->name('type_id')->layVerify('required')->render()}
+{:CMaker('text')->label('报告备注')->helpinfo('')->placeholder('')->value($vo['name'])->name('name')->layVerify('required')->render()}
+{:CMaker('webuploader')->label('上传报告')->helpinfo('')->uploadtype('file')->serverUrl(url('DataReport/uploader'))->multiple('off')->auto('on')->value($vo['path'])->name('path')->layVerify('required')->render()}
+				{:CMaker('hidden')->name('id')->value($vo['id'])->render()}
+
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

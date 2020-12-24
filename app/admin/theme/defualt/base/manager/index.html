@@ -1,0 +1,75 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<style>
+     .layui-elem-field{overflow:hidden }
+    .search-quote{float:left;width: 100%;}
+    .layui-form-item{width:33.33%;float:left;clear: none;}
+</style>
+<div class="layui-layout">
+    <fieldset class="layui-elem-field layui-field-title" >
+        <legend>搜索</legend>
+        <blockquote class="layui-elem-quote search-quote">
+        <form class="layui-form layui-form-pane" action="{:url('Manager/index')}" method="post" lay-filter="search">
+            {:CMaker("text")->label('登录名')->name('where[login_name]')->placeholder('请输入搜索的登录名')->render()}
+            {:CMaker("text")->label('真实名字')->name('where[truename]')->placeholder('请输入搜索的真实名字')->render()}
+            {:CMaker("text")->label('手机号')->name('where[mobile]')->placeholder('请输入搜索的手机号')->render()}
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <div class="layui-input-inline">
+                        <button class="layui-btn lay-submit" lay-submit data-type="search_reload_table" table-index="0">
+                            <i class="layui-icon">&#xe615;</i> 搜索
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </blockquote>
+    </fieldset>
+
+    <form class="layui-form layui-form-pane" action="{:url('Manager/index')}" method="post" lay-filter="list-table">
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            <button class="layui-btn" lay-submit data-url="{:url('Manager/pdel')}" data-call-back="reload_table" table_index="0">
+                批量删除
+            </button>
+
+            <button class="layui-btn link" data-type="page" data-url="{:url('Manager/add')}" style="float: right">
+                添加
+            </button>
+        </blockquote>
+
+       {:CMaker("table")->filter("manager")->cols([
+['type'=>'checkbox'] ,
+['field' => "id",'title' => 'id','sort' => true ],
+['field' => 'login_name','title' => '登录名','sort' => true ] ,
+['field' => 'truename','title' => '真实名字','sort' => true ] ,
+['toolbar' => '#actionTpl' ,'title' => '操作','fixed' => 'right']
+])->page(true)->limit(10)->url('/admin.php/base/manager/index.html')->render()}
+
+        <script type="text/html" id="actionTpl" lay-filter="defualt">
+            <div class="layui-btn-group">
+                <span data-url="{:url('Manager/edit')}" data-field="id" class="layui-btn layui-btn-sm" lay-event="edit">编辑</span>
+                <span data-url="{:url('Manager/del')}" data-field="id" class="layui-btn layui-btn-sm layui-btn-danger" lay-event="action" confirm-msg="确定删除？" confirm-type="del">删除</span>
+            </div>
+        </script>
+
+
+
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            <button class="layui-btn" lay-submit data-url="{:url('Manager/pdel')}" data-call-back="reload_table" table_index="0">
+                批量删除
+            </button>
+
+            <button class="layui-btn link" data-type="page" data-url="{:url('Manager/add')}" style="float: right">
+                添加
+            </button>
+        </blockquote>
+    </form>
+</div>
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

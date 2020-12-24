@@ -1,0 +1,37 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-box">
+
+    <form class="layui-form layui-form-pane" action="{:url('DataReportProblemTypes/edit_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>编辑投诉问题类型</legend>
+
+            <div class="layui-field-box">
+
+                {:CMaker('text')->label('问题类型')->helpinfo('')->placeholder('问题类型名称')->value($vo['name'])->name('name')->layVerify('required')->render()}
+				{:CMaker('hidden')->name('id')->value($vo['id'])->render()}
+
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

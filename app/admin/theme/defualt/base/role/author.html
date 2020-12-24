@@ -1,0 +1,93 @@
+{extend name='index/main'}
+
+{block name='main'}
+<div class="layui-layout">
+    <form class="layui-form layui-form-pane" action="{:url('role/author_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>角色权限设置</legend>
+
+
+            <div class="layui-field-box">
+
+                <div class="layui-form-item">
+
+                    <div class="layui-input-block">
+                        <ul id="tree" class="ztree"></ul>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <input type="hidden" value="{$vo.id}" name="id">
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit>提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+
+<script src="__PLUGIN_PATH__/zTree/js/jquery-2.2.4.min.js"></script>
+<link rel="stylesheet" href="__PLUGIN_PATH__/zTree/css/metroStyle/metroStyle.css">
+<script type="text/javascript" src="__PLUGIN_PATH__/zTree/js/jquery.ztree.all.min.js"></script>
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+
+
+<script>
+    $(function () {
+        var setting = {
+            check: {
+                enable: true
+            },
+
+            data: {
+                key:{
+                    children:'son',
+                },
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback:{
+                onCheck:function (event, treeId, treeNode) {
+
+
+                    var treeObj = $.fn.zTree.getZTreeObj("tree");
+                    var nodes = treeObj.getCheckedNodes(true);
+
+                    $('.nodeid').remove();
+                    $.each(nodes,function(i,n){
+                        $('form').append('<input class="nodeid" type="hidden" name="ids[]" value="'+n.id+'">');
+                    })
+
+                }
+            }
+        };
+
+
+
+        var data = {auth_ids:'{$vo.auth_ids}'};
+        $.post('{:url(\'role/author\')}',data,function (msg) {
+            $.fn.zTree.init($("#tree"), setting, msg);
+
+        });
+
+
+    });
+</script>
+
+
+
+
+{/block}

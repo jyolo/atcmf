@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>后台管理系统</title>
+    <link rel="icon" href="/static/image/code.png">
+    <link rel="stylesheet" href="/static/plugin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body class="layui-bg-cyan">
+    
+    <div class="admin-login-block">
+        <div class="admin-login-text">
+            <span>{:_config('admin_system_title')}</span>
+        </div>
+        <div class="login-font">
+            <span>系统登录</span>
+        </div>
+        <div class="admin-login-form">
+            <form class="layui-form" method="post" action="{:url('login/in')}" lay-filter="login">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-inline admin-login-input">
+                        <input type="text" name="login_name" required lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-inline admin-login-input">
+                        <input type="password" name="login_pwd" required lay-verify="required" placeholder="登录密码" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">验证码</label>
+                    <div class="layui-input-inline admin-login-input captcha">
+                        <input class="layui-input " type="text" name="captcha" required lay-verify="required" placeholder="验证码" autocomplete="off" >
+                    </div>
+                    <div class="layui-form-mid verifyCodeImg">
+                        <img class="verifyCode" src="{:captcha_src()}?id=login" alt="captcha" onclick="this.src='{:captcha_src()}?id=login'"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block admin-login-input">
+                        <button class="layui-btn admin-login-btn " lay-submit data-error-call-back="change_captcha_src">登录</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+    <script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+    <script>
+
+        function change_captcha_src(msg){
+            var src = '{:captcha_src()}?id=login';
+            $('.verifyCode').attr('src',src);
+        }
+    </script>
+</body>
+</html>

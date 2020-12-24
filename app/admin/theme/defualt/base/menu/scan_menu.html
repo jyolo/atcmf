@@ -1,0 +1,52 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<style>
+    .layui-elem-field{overflow:hidden }
+    .search-quote{float:left;width: 100%;}
+    .layui-form-item{width:33.33%;float:left;clear: none;}
+</style>
+<div class="layui-layout">
+    <fieldset class="layui-elem-field layui-field-title" >
+
+        <blockquote class="layui-elem-quote search-quote">
+            当文件有变动，有新的方法或者控制器条件的时候，可以扫描得到结果后，选择性的添加到权限菜单中。
+            菜单表中已经存在的会自动成为其子菜单.
+        </blockquote>
+    </fieldset>
+    <form class="layui-form layui-form-pane" action="{:url('Menu/add_scan_menu')}" method="post" lay-filter="list-table">
+        <blockquote class="layui-elem-quote layui-quote-nm">
+            {:CMaker("relation")->label('选择上级菜单')
+            ->table('menu')
+            ->showtype('treeSelect')
+            ->field('id,pid,name')
+            ->name('pid')
+            ->helpinfo('')
+            ->render()}
+            <button class="layui-btn" lay-submit  data-call-back="reload_table" table_index="0">
+                加入权限菜单
+            </button>
+
+
+        </blockquote>
+
+       {:CMaker("table")->filter("menu")->cols([
+['type'=>'checkbox'] ,
+['field' => 'name','title' => '控制器名称','width' => '50%' ] ,
+['field' => 'action','title' => '所有方法','width' => '20%' ] ,
+['field' => 'module','title' => '模型名称','sort' => true ] ,
+['field' => 'controller','title' => '控制器名称','sort' => true ] ,
+['field' => 'icon','title' => '默认图标' ] ,
+])->page(false)->url('/admin.php/base/menu/scan_menu.html')->render()}
+
+
+    </form>
+
+</div>
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}

@@ -1,0 +1,39 @@
+{extend name='../base/index/main'}
+
+{block name='main'}
+<div class="layui-box">
+
+    <form class="layui-form layui-form-pane" action="{:url('SettingGroup/edit_action')}" method="post">
+        <fieldset class="layui-elem-field">
+            <legend>编辑设置分组</legend>
+
+            <div class="layui-field-box">
+
+                {:CMaker('text')->label('分组名称')->helpinfo('')->placeholder('')->value($vo['group_name'])->name('group_name')->layVerify('required')->render()}
+{:CMaker('relation')->label('所用表单')->helpinfo('')->table('custom_form')->field('id,form_title')->showtype('select')->choose($vo['form_id'])->name('form_id')->layVerify('required')->render()}
+{:CMaker('relation')->label('所属角色')->helpinfo('')->table('role')->field('id,role_name')->showtype('checkbox')->choose($vo['role_ids'])->name('role_ids')->layVerify('')->render()}
+				{:CMaker('hidden')->name('id')->value($vo['id'])->render()}
+
+            </div>
+
+
+        </fieldset>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-inline ">
+                <button class="layui-btn"  lay-submit data-call-back="reload_table" >提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script type="text/javascript" src="__PLUGIN_PATH__/layui/layui.js"></script>
+<script type="text/javascript" src="__PLUGIN_PATH__/lay-extend-module/config.js"></script>
+
+{:CMakerJs("all")}
+
+{/block}
