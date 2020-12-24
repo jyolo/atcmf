@@ -5,6 +5,7 @@ namespace app\admin\controller;
 
 use app\admin\model\Menu;
 use CMaker\Component;
+use think\facade\View;
 
 class Index
 {
@@ -24,14 +25,14 @@ class Index
 
         $menu = Component::get_tree_array($config ,true ,true);
 
-        $this->assign('menu',$menu);
-        return $this->fetch();
+        View::assign('menu',$menu);
+        return View::fetch();
 
     }
 
     public function main(){
 
-        return $this->fetch();
+        return View::fetch();
     }
 
     /**
